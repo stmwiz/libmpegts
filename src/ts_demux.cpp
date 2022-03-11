@@ -1,9 +1,8 @@
-﻿//
-// Copyright (c) 2019-2022 gaofeng
-//
-#include <srt/Tsdemux.h>
-#include <string.h>
-#include "memory.h"
+﻿#include "ts_demux.hpp"
+
+#include <cstring>
+#include <memory>
+
 using namespace std;
 
 Tsdemux::Tsdemux():_data_total(0)

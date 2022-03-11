@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-struct MpegTsAdaptationFieldType
+namespace MpegTsAdaptationFieldType
 {
     // Reserved for future use by ISO/IEC
     static const uint8_t reserved = 0x00;
@@ -16,8 +16,8 @@ struct MpegTsAdaptationFieldType
 
 class TsBuffer;
 
-extern void write_pcr(TsBuffer *sb, uint64_t pcr);
-extern void write_pts(TsBuffer *sb, uint32_t fb, uint64_t pts);
+void write_pcr(TsBuffer *sb, uint64_t pcr);
+void write_pts(TsBuffer *sb, uint32_t fb, uint64_t pts);
 
-extern uint64_t read_pts(TsBuffer *sb);
-extern uint64_t read_pcr(TsBuffer *sb);
+uint64_t read_pts(TsBuffer *sb);
+uint64_t read_pcr(TsBuffer *sb);

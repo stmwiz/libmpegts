@@ -1,34 +1,25 @@
-//
-// Copyright (c) 2019-2022 gaofeng akanchi
-//
-
-#include <cstdint>
 #include <memory>
 #include <vector>
 #include <string>
 
 class TsBuffer;
 
-class MpegTsStream
+namespace MpegTsStream
 {
-public:
     static const uint8_t AAC = 0x0f;
     static const uint8_t AVC = 0x1b;
-};
+}
 
-class TsFrame
+struct TsFrame
 {
-public:
-    TsFrame();
-    TsFrame(uint8_t st);
-    virtual ~TsFrame(){};
+    explicit TsFrame();
+    explicit TsFrame(uint8_t st);
+    virtual ~TsFrame();
 
-public:
-    bool empty();
+    bool empty() const;
     void reset();
 
-public:
-    std::shared_ptr<TsBuffer> _data;
+    std::shared_ptr<TsBuffer> data_;
     uint64_t pts;
     uint64_t dts;
     uint64_t pcr;
@@ -39,17 +30,14 @@ public:
     bool completed;
 };
 
-class TsHeader
+struct TsHeader
 {
-public:
-    TsHeader();
+    explicit TsHeader();
     virtual ~TsHeader();
 
-public:
     void encode(TsBuffer *sb);
     void decode(TsBuffer *sb);
 
-public:
     uint8_t sync_byte;                      // 8 bits
     uint8_t transport_error_indicator;      // 1 bit
     uint8_t payload_unit_start_indicator;   // 1 bit
@@ -60,18 +48,15 @@ public:
     uint8_t continuity_counter;             // 4 bits
 };
 
-class PATHeader
+struct PATHeader
 {
-public:
-    PATHeader();
+    explicit PATHeader();
     virtual ~PATHeader();
 
-public:
     void encode(TsBuffer *sb);
     void decode(TsBuffer *sb);
-    void print();
+    std::string dump_info();
 
-public:
     uint8_t table_id;                       // 8 bits
     uint8_t section_syntax_indicator;       // 1 bit
     uint8_t b0;                             // 1 bit
@@ -85,20 +70,17 @@ public:
     uint8_t last_section_number;            // 8 bits
 };
 
-class PMTElementInfo
+struct PMTElementInfo
 {
-public:
-    PMTElementInfo();
-    PMTElementInfo(uint8_t st, uint16_t pid);
+    explicit PMTElementInfo();
+    explicit PMTElementInfo(uint8_t st, uint16_t pid);
     virtual ~PMTElementInfo();
 
-public:
     void encode(TsBuffer *sb);
     void decode(TsBuffer *sb);
     uint16_t size();
-    void print();
+    std::string dump_info();
 
-public:
     uint8_t stream_type;                    // 8 bits
     uint8_t reserved0;                      // 3 bits
     uint16_t elementary_PID;                // 13 bits
@@ -107,19 +89,16 @@ public:
     std::string ES_info;
 };
 
-class PMTHeader
+struct PMTHeader
 {
-public:
-    PMTHeader();
+    explicit PMTHeader();
     virtual ~PMTHeader();
 
-public:
     void encode(TsBuffer *sb);
     void decode(TsBuffer *sb);
     uint16_t size();
-    void print();
+    std::string dump_info();
 
-public:
     uint8_t table_id;                       // 8 bits
     uint8_t section_syntax_indicator;       // 1 bit
     uint8_t b0;                             // 1 bit
@@ -138,17 +117,14 @@ public:
     std::vector<std::shared_ptr<PMTElementInfo>> infos;
 };
 
-class AdaptationFieldHeader
+struct AdaptationFieldHeader
 {
-public:
-    AdaptationFieldHeader();
+    explicit AdaptationFieldHeader();
     virtual ~AdaptationFieldHeader();
 
-public:
     void encode(TsBuffer *sb);
     void decode(TsBuffer *sb);
 
-public:
     uint8_t adaptation_field_length;                // 8 bits
     uint8_t adaptation_field_extension_flag;        // 1 bit
     uint8_t transport_private_data_flag;            // 1 bit
@@ -160,17 +136,14 @@ public:
     uint8_t discontinuity_indicator;                // 1 bit
 };
 
-class PESHeader
+struct PESHeader
 {
-public:
-    PESHeader();
+    explicit PESHeader();
     virtual ~PESHeader();
 
-public:
     void encode(TsBuffer *sb);
     void decode(TsBuffer *sb);
 
-public:
     uint32_t packet_start_code;             // 24 bits
     uint8_t stream_id;                      // 8 bits
     uint16_t pes_packet_length;             // 16 bits

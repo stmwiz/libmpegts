@@ -1,18 +1,11 @@
-﻿//
-// Copyright (c) 2019-2022 gaofeng
-//
+﻿#pragma once
 
-#ifndef SRT_INCLUDE_TSDEMUX_H_
-#define SRT_INCLUDE_TSDEMUX_H_
 #include <string>
 #include <memory>
 #include <vector>
 #include <map>
 #include <unordered_map>
-#include "srt_data.hpp"
-#include "util/ErrorCode.h"
-#include "TsPid.h"
-
+#include "ts_pid.hpp"
 
 typedef struct ts_media_data_callback_I {
 	void* context;
@@ -181,5 +174,5 @@ public:
 	    uint64_t _last_dts;
 	    uint64_t _last_pts;
 };
+
 typedef std::shared_ptr<Tsdemux> TS_DEMUX_PTR;
-#endif /* SRT_INCLUDE_TSDEMUX_H_ */
