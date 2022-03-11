@@ -3,14 +3,7 @@
 #include "ts_buffer.hpp"
 #include "ts_packet.hpp"
 
-TsFrame::TsFrame(){
-    data_.reset(new TsBuffer);
-    pts=dts=pcr=0;
-    stream_type=stream_id=0;
-    completed=false;
-    pid=0;
-    expected_pes_packet_length=0;
-}
+TsFrame::TsFrame():TsFrame(0){}
 
 TsFrame::TsFrame(uint8_t st){
     stream_type=st;
@@ -22,9 +15,7 @@ TsFrame::TsFrame(uint8_t st){
     data_.reset(new TsBuffer);
 }
 
-TsFrame::~TsFrame()
-{
-}
+TsFrame::~TsFrame() {}
 
 bool TsFrame::empty() const
 {

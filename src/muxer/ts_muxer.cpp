@@ -189,7 +189,7 @@ void TsMuxer::create_pes(TsPes *frame, uint8_t *p, int32_t plen,
     memcpy(frame->data + packet.size(), p, plen);
     frame->len = plen + packet.size();
 }
-void TsMuxer::create_ts(TsPes *frame, std::vector<TsBuffer> *sb) {
+void TsMuxer::create_ts(TsPes *frame, std::vector<TsBuffer> &sb) {
     bool first = true;
     while (frame->pos < frame->len) {
         TsBuffer packet;
@@ -259,7 +259,7 @@ void TsMuxer::create_ts(TsPes *frame, std::vector<TsBuffer> *sb) {
             packet.set_data(packet.pos(), frame->data + frame->pos, in_size);
             frame->pos += in_size;
         }
-        sb->push_back(packet);
+        sb.push_back(packet);
     }
 }
 
@@ -287,7 +287,6 @@ void TsMuxer::create_pcr(TsBuffer *sb) {
     adapt_field.transport_private_data_flag = 0;
     adapt_field.adaptation_field_extension_flag = 0;
 
-       // char *p = sb->data();
     ts_header.encode(sb);
     adapt_field.encode(sb);
     write_pcr(sb, pcr);
@@ -309,7 +308,7 @@ void TsMuxer::create_null(TsBuffer *sb) {
 
 void TsMuxer::encode(uint8_t *p, int32_t plen, int32_t frametype,
     int64_t timestamp, TsStream streamType,
-    std::vector<TsBuffer> *sb) {
+    std::vector<TsBuffer> &sb) {
     if (should_create_pat()) {
         encode_pmt_without_data(sb);
     }
@@ -327,7 +326,7 @@ void TsMuxer::encode(uint8_t *p, int32_t plen, int32_t frametype,
 }
 void TsMuxer::encode_with_pmt(uint8_t *p, int32_t plen, int32_t frametype,
     int64_t timestamp, TsStream streamType,
-    std::vector<TsBuffer> *sb) {
+    std::vector<TsBuffer> &sb) {
     encode_pmt_without_data(sb);
 
     auto frame = static_cast<TsPes*>(malloc(sizeof(TsPes)));
@@ -352,13 +351,13 @@ uint8_t TsMuxer::get_cc(uint32_t with_pid) {
     return 0;
 }
 
-void TsMuxer::encode_pmt_without_data(std::vector<TsBuffer> *sb){
+void TsMuxer::encode_pmt_without_data(std::vector<TsBuffer> &sb){
     current_index=0;
-    sb->push_back(TsBuffer());
+    sb.push_back(TsBuffer());
     uint8_t pat_pmt_cc = get_cc(0);
-    create_pat(&sb->at(0), m_pmt_pid, pat_pmt_cc);
-    sb->push_back(TsBuffer());
-    create_pmt(&sb->at(1), pat_pmt_cc);
+    create_pat(&sb.at(0), m_pmt_pid, pat_pmt_cc);
+    sb.push_back(TsBuffer());
+    create_pmt(&sb.at(1), pat_pmt_cc);
 }
 
 bool TsMuxer::should_create_pat() {

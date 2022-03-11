@@ -3,23 +3,21 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <map>
 #include <unordered_map>
+
 #include "ts_pid.hpp"
 
-typedef struct ts_media_data_callback_I {
-	void* context;
-	void (*on_data_callback)(void* context,SRT_DATA_MSG_PTR data_ptr, uint32_t  media_type, uint64_t dts, uint64_t pts);
-}ts_media_data_callback_I;
+struct ts_media_data_callback_I {
+    void* context;
+    void (*on_data_callback)(void* context,SRT_DATA_MSG_PTR data_ptr, uint32_t  media_type, uint64_t dts, uint64_t pts);
+};
 
 typedef std::shared_ptr<ts_media_data_callback_I> TS_DATA_CALLBACK_PTR;
 
-class adaptation_field {
-public:
-    adaptation_field(){};
-    ~adaptation_field(){};
+struct AdaptationField {
+    AdaptationField(){};
+    ~AdaptationField(){};
 
-public:
     uint8_t _adaptation_field_length;
 
     uint8_t _discontinuity_indicator:1;
@@ -31,7 +29,7 @@ public:
     uint8_t _transport_private_data_flag:1;
     uint8_t _adaptation_field_extension_flag:1;
 
-    //if(PCR_flag == '1')
+       //if(PCR_flag == '1')
     unsigned long _program_clock_reference_base;//33 bits
     unsigned short _program_clock_reference_extension;//9bits
     //if (OPCR_flag == '1')
@@ -62,12 +60,10 @@ public:
     unsigned short _DTS_next_AU3;//15bit
 };
 
-class ts_header {
-public:
-    ts_header(){}
-    ~ts_header(){}
+struct TsHeader {
+    TsHeader(){}
+    ~TsHeader(){}
 
-public:
     uint8_t _sync_byte;
 
     unsigned short _transport_error_indicator:1;
@@ -79,21 +75,19 @@ public:
     uint8_t _adaptation_field_control:2;
     uint8_t _continuity_counter:4;
 
-    adaptation_field _adaptation_field_info;
+    AdaptationField _adaptation_field_info;
 };
 
-typedef struct {
+struct PID_INFO{
     unsigned short _program_number;
     unsigned short _pid;
     unsigned short _network_id;
-} PID_INFO;
+};
 
-class pat_info {
-public:
+struct pat_info {
     pat_info(){};
     ~pat_info(){};
 
-public:
     uint8_t _table_id;
 
     unsigned short _section_syntax_indicator:1;
@@ -112,21 +106,20 @@ public:
     std::vector<PID_INFO> _pid_vec;
 };
 
-typedef struct {
+struct STREAM_PID_INFO{
     uint8_t  _stream_type;
-    unsigned short _reserved1:3;
-    unsigned short _elementary_PID:13;
-    unsigned short _reserved:4;
-    unsigned short _ES_info_length;
+    uint16_t _reserved1:3;
+    uint16_t _elementary_PID:13;
+    uint16_t _reserved:4;
+    uint16_t _ES_info_length;
     uint8_t  _dscr[4096];
-    uint32_t    _crc_32;
-} STREAM_PID_INFO;
+    uint32_t _crc_32;
+} ;
 
-class pmt_info {
-public:
+struct pmt_info {
     pmt_info(){};
     ~pmt_info(){};
-public:
+
     uint8_t _table_id;
     unsigned short _section_syntax_indicator:1;
     unsigned short _reserved1:1;
@@ -150,29 +143,28 @@ public:
 
 class Tsdemux {
 public:
-	Tsdemux();
-	virtual ~Tsdemux();
-	 int32_t decode(SRT_DATA_MSG_PTR data_ptr, ts_media_data_callback_I* callback);
+    Tsdemux();
+    virtual ~Tsdemux();
+    int32_t decode(SRT_DATA_MSG_PTR data_ptr, ts_media_data_callback_I* callback);
 
-	private:
-	    int32_t decode_unit(uint8_t* data_p,ts_media_data_callback_I* callback);
-	    bool is_pmt(unsigned short pmt_id);
-	    int32_t pes_parse(uint8_t* p, size_t npos, uint8_t** ret_pp, size_t& ret_size,
-	            uint64_t& dts, uint64_t& pts,int32_t *pesLen);
-	    void insert_into_databuf(uint8_t* data_p, size_t data_size, unsigned short pid);
-	    void on_callback(ts_media_data_callback_I* callback, unsigned short pid, uint64_t dts, uint64_t pts);
+private:
+    int32_t decode_unit(uint8_t* data_p,ts_media_data_callback_I* callback);
+    bool is_pmt(unsigned short pmt_id);
+    int32_t pes_parse(uint8_t* p, size_t npos, uint8_t** ret_pp, size_t& ret_size,
+        uint64_t& dts, uint64_t& pts,int32_t *pesLen);
+    void insert_into_databuf(uint8_t* data_p, size_t data_size, unsigned short pid);
+    void on_callback(ts_media_data_callback_I* callback, unsigned short pid, uint64_t dts, uint64_t pts);
 
-	private:
-	    std::string _key_path;//only for srt
+private:
+    std::string _key_path;//only for srt
 
-	    pat_info _pat;
-	    pmt_info _pmt;
-	    std::map<int,std::vector<SRT_DATA_MSG_PTR>> _data_buffer_map;
-	   //std::vector<SRT_DATA_MSG_PTR> _data_buffer_vec;
-	    size_t _data_total;
-	    unsigned short _last_pid;
-	    uint64_t _last_dts;
-	    uint64_t _last_pts;
+    pat_info _pat;
+    pmt_info _pmt;
+    std::unordered_map<int,std::vector<SRT_DATA_MSG_PTR>> _data_buffer_map;
+    size_t _data_total;
+    unsigned short _last_pid;
+    uint64_t _last_dts;
+    uint64_t _last_pts;
 };
 
 typedef std::shared_ptr<Tsdemux> TS_DEMUX_PTR;

@@ -6,9 +6,9 @@
 using namespace std;
 
 Tsdemux::Tsdemux():_data_total(0)
-,_last_pid(0)
-,_last_dts(0)
-,_last_pts(0) {
+    ,_last_pid(0)
+    ,_last_dts(0)
+    ,_last_pts(0) {
 
 
 }
@@ -121,7 +121,7 @@ int32_t Tsdemux::decode_unit(uint8_t* data_p,  ts_media_data_callback_I* callbac
     }
 
     if(ts_header_info._adaptation_field_control == 1
-       || ts_header_info._adaptation_field_control == 3 ) {
+        || ts_header_info._adaptation_field_control == 3 ) {
         // data_byte with placeholder
         // payload parser
         if(ts_header_info._PID == 0x00){
@@ -144,8 +144,8 @@ int32_t Tsdemux::decode_unit(uint8_t* data_p,  ts_media_data_callback_I* callbac
             _pat._section_number = data_p[pos];
             pos++;
             _pat._last_section_number = data_p[pos];
-      //      assert(_pat._table_id == 0x00);
-       //     assert((188 - npos) > (_pat._section_length+3)); // PAT = section_length + 3
+            //      assert(_pat._table_id == 0x00);
+            //     assert((188 - npos) > (_pat._section_length+3)); // PAT = section_length + 3
             pos++;
             _pat._pid_vec.clear();
             for (;pos+4 <= _pat._section_length-5-4+9 + npos;) { // 4:CRC, 5:follow section_length item  rpos + 4(following unit length) section_length + 9(above field and unit_start_first_byte )
@@ -153,16 +153,16 @@ int32_t Tsdemux::decode_unit(uint8_t* data_p,  ts_media_data_callback_I* callbac
                 //program_number 16 uimsbf
                 pid_info._program_number = data_p[pos]<<8|data_p[pos+1];
                 pos += 2;
-//              reserved 3 bslbf
+                //              reserved 3 bslbf
 
                 if (pid_info._program_number == 0) {
-//                  // network_PID 13 uimsbf
+                    //                  // network_PID 13 uimsbf
                     pid_info._network_id = (data_p[pos]<<8|data_p[pos+1])&0x1FFF;
                     //printf("#### network id:%d.\r\n", pid_info._network_id);
                     pos += 2;
                 }
                 else {
-//                  //     program_map_PID 13 uimsbf
+                    //                  //     program_map_PID 13 uimsbf
                     pid_info._pid = (data_p[pos]<<8|data_p[pos+1])&0x1FFF;
                     //printf("#### pmt id:%d.\r\n", pid_info._pid);
                     pos += 2;
@@ -170,7 +170,7 @@ int32_t Tsdemux::decode_unit(uint8_t* data_p,  ts_media_data_callback_I* callbac
                 _pat._pid_vec.push_back(pid_info);
                 // network_PID and program_map_PID save to list
             }
-//               CRC_32 use pat to calc crc32, eq
+            //               CRC_32 use pat to calc crc32, eq
             pos += 4;
         }else if(ts_header_info._PID == 0x01){
             // CAT // conditional access table
@@ -205,14 +205,14 @@ int32_t Tsdemux::decode_unit(uint8_t* data_p,  ts_media_data_callback_I* callbac
             _pmt._PCR_PID = ((data_p[pos]<<8)|data_p[pos+1])&0x1FFF; //PCR_PID 13 uimsbf
             pos += 2;
 
-            //reserved 4 bslbf
+               //reserved 4 bslbf
             _pmt._program_info_length = ((data_p[pos]<<8)|data_p[pos+1])&0x0FFF;//program_info_length 12 uimsbf
             pos += 2;
-          //  assert(_pmt._table_id==0x02); //  0x02, // TS_program_map_section
+            //  assert(_pmt._table_id==0x02); //  0x02, // TS_program_map_section
             memcpy(_pmt._dscr, data_p+pos, _pmt._program_info_length);
-//               for (i = 0; i < N; i++) {
-//                   descriptor()
-//               }
+            //               for (i = 0; i < N; i++) {
+            //                   descriptor()
+            //               }
             pos += _pmt._program_info_length;
             _pmt._stream_pid_vec.clear();
             _pmt._pid2steamtype.clear();
@@ -252,10 +252,10 @@ int32_t Tsdemux::decode_unit(uint8_t* data_p,  ts_media_data_callback_I* callbac
             // Null packet
         }else{//pes packet or pure data packet
             //bool isFound = false;
-        	//printf("%d,",_pmt._stream_pid_vec.size());
+            //printf("%d,",_pmt._stream_pid_vec.size());
             for (size_t i = 0; i < _pmt._stream_pid_vec.size(); i++) {
                 if(ts_header_info._PID == _pmt._stream_pid_vec[i]._elementary_PID){
-                //if(ts_header_info._PID == 225||ts_header_info._PID == 192){
+                    //if(ts_header_info._PID == 225||ts_header_info._PID == 192){
                     //isFound = true;
                     if(ts_header_info._payload_unit_start_indicator){
                         uint8_t* ret_data_p = nullptr;
@@ -263,24 +263,24 @@ int32_t Tsdemux::decode_unit(uint8_t* data_p,  ts_media_data_callback_I* callbac
                         uint64_t dts = 0;
                         uint64_t pts = 0;
 
-                        //callback last media data in data buffer
+                           //callback last media data in data buffer
                         on_callback(callback, _last_pid,  _last_dts, _last_pts);
                         int32_t peslen=0;
                         int32_t ret = pes_parse(data_p+npos, npos, &ret_data_p, ret_size, dts, pts,&peslen);
-                      //  assert(ret <= 188);
+                        //  assert(ret <= 188);
                         if (ret > 188) {
                             return -1;
                         }
 
                         _last_pts = pts;
                         _last_dts = (dts == 0) ? pts : dts;
-                          if ((ret_data_p != nullptr) && (ret_size > 0)) {
+                        if ((ret_data_p != nullptr) && (ret_size > 0)) {
                             insert_into_databuf(ret_data_p, ret_size,  ts_header_info._PID);
                             if((peslen+npos)<=188) on_callback(callback, _last_pid, _last_dts, _last_pts);
 
                         }
                     }else{
-                           insert_into_databuf(data_p + npos, 188-npos,ts_header_info._PID);
+                        insert_into_databuf(data_p + npos, 188-npos,ts_header_info._PID);
                     }
                 }
             }
@@ -321,59 +321,59 @@ void Tsdemux::insert_into_databuf(uint8_t* data_p, size_t data_size,  unsigned s
     _data_total += data_size;
     int32_t key=pid;
     _data_buffer_map.find(key);
-  std::map<int,vector<SRT_DATA_MSG_PTR>>::iterator iter1=_data_buffer_map.find(key);
-	if(iter1 ==_data_buffer_map.end()){
-		_data_buffer_map.insert(pair<int,vector<SRT_DATA_MSG_PTR>>(key,vector<SRT_DATA_MSG_PTR>()));
-		std::map<int,vector<SRT_DATA_MSG_PTR>>::iterator iter=_data_buffer_map.find(key);
-		iter->second.push_back(std::make_shared<SRT_DATA_MSG>(data_p, data_size));
-	}else{
-		iter1->second.push_back(std::make_shared<SRT_DATA_MSG>(data_p, data_size));
-	}
+    std::unordered_map<int,vector<SRT_DATA_MSG_PTR>>::iterator iter1=_data_buffer_map.find(key);
+    if(iter1 ==_data_buffer_map.end()){
+        _data_buffer_map.insert(pair<int,vector<SRT_DATA_MSG_PTR>>(key,vector<SRT_DATA_MSG_PTR>()));
+        std::map<int,vector<SRT_DATA_MSG_PTR>>::iterator iter=_data_buffer_map.find(key);
+        iter->second.push_back(std::make_shared<SRT_DATA_MSG>(data_p, data_size));
+    }else{
+        iter1->second.push_back(std::make_shared<SRT_DATA_MSG>(data_p, data_size));
+    }
 
 }
 
 void Tsdemux::on_callback(ts_media_data_callback_I* callback, unsigned short pid,
-                            uint64_t dts, uint64_t pts) {
+    uint64_t dts, uint64_t pts) {
 
-   int32_t stream_type = pid;//0xe1;//iter->second;
-  std::map<int,vector<SRT_DATA_MSG_PTR>>::iterator iter=_data_buffer_map.find(stream_type);
-   vector<SRT_DATA_MSG_PTR>* _data_buffer_vec=NULL;
- 	if(iter ==_data_buffer_map.end()){
- 		_data_buffer_map.insert(pair<int,vector<SRT_DATA_MSG_PTR>>(stream_type,vector<SRT_DATA_MSG_PTR>()));
- 		return;
- 	}
- 	_data_buffer_vec=&iter->second;
- 	if(_data_buffer_vec->size()==0){
- 		 _data_buffer_vec=NULL;
- 		return;
- 	}
- 	int32_t dataLen=0;
+    int32_t stream_type = pid;//0xe1;//iter->second;
+    std::unordered_map<int,vector<SRT_DATA_MSG_PTR>>::iterator iter=_data_buffer_map.find(stream_type);
+    vector<SRT_DATA_MSG_PTR>* _data_buffer_vec=NULL;
+    if(iter ==_data_buffer_map.end()){
+        _data_buffer_map.insert(pair<int,vector<SRT_DATA_MSG_PTR>>(stream_type,vector<SRT_DATA_MSG_PTR>()));
+        return;
+    }
+    _data_buffer_vec=&iter->second;
+    if(_data_buffer_vec->size()==0){
+        _data_buffer_vec=NULL;
+        return;
+    }
+    int32_t dataLen=0;
     size_t index =0;
     for ( index = 0; index < _data_buffer_vec->size(); index++) {
-    	dataLen+=_data_buffer_vec->at(index)->data_len();
-      }
+        dataLen+=_data_buffer_vec->at(index)->data_len();
+    }
     if(dataLen>0){
-		auto total_data_ptr = std::make_shared<SRT_DATA_MSG>(dataLen);
-		size_t pos = 0;
-		for ( index = 0; index < _data_buffer_vec->size(); index++) {
-			  memcpy(total_data_ptr->get_data() + pos,
-				  _data_buffer_vec->at(index)->get_data(),
-				  _data_buffer_vec->at(index)->data_len());
-			  pos += _data_buffer_vec->at(index)->data_len();
-		  }
-		_data_buffer_vec->clear();
-		_data_buffer_vec=NULL;
-		callback->on_data_callback(callback->context,total_data_ptr, stream_type, dts, pts);
+        auto total_data_ptr = std::make_shared<SRT_DATA_MSG>(dataLen);
+        size_t pos = 0;
+        for ( index = 0; index < _data_buffer_vec->size(); index++) {
+            memcpy(total_data_ptr->get_data() + pos,
+                _data_buffer_vec->at(index)->get_data(),
+                _data_buffer_vec->at(index)->data_len());
+            pos += _data_buffer_vec->at(index)->data_len();
+        }
+        _data_buffer_vec->clear();
+        _data_buffer_vec=NULL;
+        callback->on_data_callback(callback->context,total_data_ptr, stream_type, dts, pts);
     }else{
-      _data_buffer_vec->clear();
-      _data_buffer_vec=NULL;
+        _data_buffer_vec->clear();
+        _data_buffer_vec=NULL;
     }
 
     return;
 }
 
 bool Tsdemux::is_pmt(unsigned short pid) {
-	//printf("%hd,",pid);
+    //printf("%hd,",pid);
     for (size_t index = 0; index < _pat._pid_vec.size(); index++) {
         if (_pat._pid_vec[index]._program_number != 0) {
             if (_pat._pid_vec[index]._pid == pid) {
@@ -386,10 +386,10 @@ bool Tsdemux::is_pmt(unsigned short pid) {
 
 
 int32_t Tsdemux::pes_parse(uint8_t* p, size_t npos,
-                        uint8_t** ret_pp, size_t& ret_size,
-                        uint64_t& dts, uint64_t& pts,int32_t *pesLen) {
+    uint8_t** ret_pp, size_t& ret_size,
+    uint64_t& dts, uint64_t& pts,int32_t *pesLen) {
     int32_t pos = 0;
-  //  int32_t packet_start_code_prefix = (p[pos]<<16)|(p[pos+1]<<8)|p[pos+2];  //packet_start_code_prefix 24 bslbf
+    //  int32_t packet_start_code_prefix = (p[pos]<<16)|(p[pos+1]<<8)|p[pos+2];  //packet_start_code_prefix 24 bslbf
     pos += 3;
     int32_t stream_id = p[pos]; //stream_id 8 uimsbf
     pos++;
@@ -400,8 +400,8 @@ int32_t Tsdemux::pes_parse(uint8_t* p, size_t npos,
     (void)PES_packet_length;
 
     pos += 2;
-  //    packet_start_code_prefix, npos, PES_packet_length, stream_id);
- //   assert(0x00000001 == packet_start_code_prefix);
+    //    packet_start_code_prefix, npos, PES_packet_length, stream_id);
+    //   assert(0x00000001 == packet_start_code_prefix);
     if (stream_id != 188//program_stream_map 1011 1100
         && stream_id != 190//padding_stream 1011 1110
         && stream_id != 191//private_stream_2 1011 1111
@@ -572,24 +572,24 @@ int32_t Tsdemux::pes_parse(uint8_t* p, size_t npos,
 
         *ret_pp = p+pos;
         ret_size = 188-(npos+pos);
-   //    ret_size, p[pos], p[pos+1], p[pos+2], p[pos+3], p[pos+4], p[pos+5],
+        //    ret_size, p[pos], p[pos+1], p[pos+2], p[pos+3], p[pos+4], p[pos+5],
         //    dts, dts/90, pts, pts/90);
     }
     else if ( stream_id == 188//program_stream_map 1011 1100 BC
-             || stream_id == 191//private_stream_2 1011 1111 BF
-             || stream_id == 240//ECM 1111 0000 F0
-             || stream_id == 241//EMM 1111 0001 F1
-             || stream_id == 255//program_stream_directory 1111 1111 FF
-             || stream_id == 242//DSMCC_stream 1111 0010 F2
-             || stream_id == 248//ITU-T Rec. H.222.1 type E stream 1111 1000 F8
-             ) {
+        || stream_id == 191//private_stream_2 1011 1111 BF
+        || stream_id == 240//ECM 1111 0000 F0
+        || stream_id == 241//EMM 1111 0001 F1
+        || stream_id == 255//program_stream_directory 1111 1111 FF
+        || stream_id == 242//DSMCC_stream 1111 0010 F2
+        || stream_id == 248//ITU-T Rec. H.222.1 type E stream 1111 1000 F8
+        ) {
 
         *ret_pp = p+pos;
         ret_size = 188-(npos+pos);
 
     }
     else if ( stream_id == 190//padding_stream 1011 1110
-             ) {
+        ) {
         *ret_pp = p+pos;
         ret_size = 188-(npos+pos);
     }
