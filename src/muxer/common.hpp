@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+namespace MpegTsMuxer {
+
 namespace MpegTsAdaptationFieldType
 {
     // Reserved for future use by ISO/IEC
@@ -21,3 +23,5 @@ void write_pts(TsBuffer *sb, uint32_t fb, uint64_t pts);
 
 uint64_t read_pts(TsBuffer *sb);
 uint64_t read_pcr(TsBuffer *sb);
+
+}

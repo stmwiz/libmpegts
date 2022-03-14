@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+namespace MpegTsMuxer {
+
 // only support little endian
 class TsBuffer
 {
@@ -45,4 +47,5 @@ private:
     int32_t pos_ = 0;
     int32_t cur_pos_= 0;
 };
+}
 

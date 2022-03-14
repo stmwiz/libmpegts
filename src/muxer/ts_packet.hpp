@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 
+namespace MpegTsMuxer {
+
 class TsBuffer;
 
 namespace MpegTsStream
@@ -162,3 +164,6 @@ struct PESHeader
     uint8_t pts_dts_flags;                  // 2 bits
     uint8_t header_data_length;             // 8 bits
 };
+
+
+}

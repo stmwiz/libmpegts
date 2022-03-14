@@ -3,6 +3,8 @@
 #include "ts_buffer.hpp"
 #include "ts_packet.hpp"
 
+namespace MpegTsMuxer {
+
 TsFrame::TsFrame():TsFrame(0){}
 
 TsFrame::TsFrame(uint8_t st){
@@ -486,4 +488,6 @@ void PESHeader::decode(TsBuffer *sb)
     pts_dts_flags = (b7 >> 6) & 0x03;
 
     header_data_length = sb->read_1byte();
+}
+
 }

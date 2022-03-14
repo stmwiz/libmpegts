@@ -5,6 +5,8 @@
 #include "common.hpp"
 #include "crc.hpp"
 
+namespace MpegTsMuxer {
+
 TsMuxer::TsMuxer() {
     m_pmt_pid = MPEGTS_PMT_PID;
     m_stream_pid_map[TsPID::STREAM_TYPE_VIDEO_H264]= TsPID::_H264_PID;
@@ -373,5 +375,7 @@ bool TsMuxer::should_create_pat() {
     current_index++;
 
     return ret;
+}
+
 }
 

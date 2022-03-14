@@ -2,6 +2,8 @@
 
 #include "ts_buffer.hpp"
 
+namespace MpegTsMuxer {
+
 void write_pcr(TsBuffer *sb, uint64_t pcr) {
     sb->write_1byte((char)(pcr >> 25));
     sb->write_1byte((char)(pcr >> 17));
@@ -59,4 +61,6 @@ uint64_t read_pcr(TsBuffer *sb) {
     sb->read_1byte();
 
     return pcr;
+}
+
 }

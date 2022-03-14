@@ -7,6 +7,8 @@
 #include "ts_packet.hpp"
 #include "ts_pid.hpp"
 
+namespace MpegTsMuxer {
+
 class TsMuxer {
     enum TsStream {
         TS_H264,
@@ -55,3 +57,4 @@ private:
     std::unordered_map<uint32_t, uint8_t> pid_cc_map;
 };
 
+}

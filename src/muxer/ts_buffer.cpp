@@ -4,6 +4,8 @@
 
 #include "ts_buffer.hpp"
 
+namespace MpegTsMuxer {
+
 void TsBuffer::write_1byte(char val)
 {
     data_[cur_pos_++]=val;
@@ -198,4 +200,6 @@ void TsBuffer::set_data(int32_t pos, const uint8_t *data, int32_t len)
 std::string TsBuffer::to_string()
 {
     return std::string(data_, data_+cur_pos_);
+}
+
 }
