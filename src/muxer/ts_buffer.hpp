@@ -32,9 +32,9 @@ public:
 public:
     void skip(int32_t size);
     bool require(int32_t required_size);
-    bool empty();
-    int32_t size();
-    int32_t pos();
+    bool empty() const;
+    int32_t size() const;
+    int32_t pos() const;
     uint8_t *data();
     void clear();
     void set_data(int32_t pos, const uint8_t *data, int32_t len);

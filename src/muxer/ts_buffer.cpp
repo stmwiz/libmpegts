@@ -156,17 +156,17 @@ bool TsBuffer::require(int32_t required_size)
     return required_size <= cur_pos_- pos_;
 }
 
-bool TsBuffer::empty()
+bool TsBuffer::empty() const
 {
     return pos_ >= cur_pos_;
 }
 
-int32_t TsBuffer::size()
+int32_t TsBuffer::size() const
 {
     return cur_pos_;
 }
 
-int32_t TsBuffer::pos()
+int32_t TsBuffer::pos() const
 {
     return pos_;
 }

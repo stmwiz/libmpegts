@@ -124,8 +124,7 @@ void TsMuxer::create_pmt(TsBuffer *sb, uint8_t cc) {
     pmt_sb.write_bytes(stuff.data(), 188 - suffLen);
     sb->append(pmt_sb.data(), pmt_sb.size());
 }
-void TsMuxer::create_pes(TsPes *frame, uint8_t *p, int32_t plen,
-    int32_t frametype, int64_t timestamp, TsStream pstreamType) {
+void TsMuxer::create_pes(TsPes *frame, uint8_t *p, int32_t plen,int64_t timestamp, TsStream pstreamType) {
     TsBuffer packet;
     PESHeader pes_header;
     uint8_t streamType = TsPID::STREAM_TYPE_VIDEO_H264;
@@ -308,8 +307,7 @@ void TsMuxer::create_null(TsBuffer *sb) {
     ts_header.encode(sb);
 }
 
-void TsMuxer::encode(uint8_t *p, int32_t plen, int32_t frametype,
-    int64_t timestamp, TsStream streamType,
+void TsMuxer::encode(uint8_t *p, int32_t plen,int64_t timestamp, TsStream streamType,
     std::vector<TsBuffer> &sb) {
     if (should_create_pat()) {
         encode_pmt_without_data(sb);
@@ -319,15 +317,14 @@ void TsMuxer::encode(uint8_t *p, int32_t plen, int32_t frametype,
     memset(frame, 0, sizeof(TsPes));
     frame->data = (uint8_t*) malloc(plen + 20);
     frame->len = plen;
-    create_pes(frame, p, plen, frametype, timestamp, streamType);
+    create_pes(frame, p, plen, timestamp, streamType);
     create_ts(frame, sb);
     free(frame->data);
     frame->data = nullptr;
     free(frame);
     frame = nullptr;
 }
-void TsMuxer::encode_with_pmt(uint8_t *p, int32_t plen, int32_t frametype,
-    int64_t timestamp, TsStream streamType,
+void TsMuxer::encode_with_pmt(uint8_t *p, int32_t plen, int64_t timestamp, TsStream streamType,
     std::vector<TsBuffer> &sb) {
     encode_pmt_without_data(sb);
 
@@ -335,7 +332,7 @@ void TsMuxer::encode_with_pmt(uint8_t *p, int32_t plen, int32_t frametype,
     memset(frame, 0, sizeof(TsPes));
     frame->data = (uint8_t*) malloc(plen + 20);
     frame->len = plen;
-    create_pes(frame, p, plen, frametype, timestamp, streamType);
+    create_pes(frame, p, plen, timestamp, streamType);
     create_ts(frame, sb);
     free(frame->data);
     frame->data = nullptr;
