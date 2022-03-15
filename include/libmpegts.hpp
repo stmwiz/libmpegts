@@ -16,20 +16,22 @@
 
 #include <cstdint>
 
-constexpr int TS_H264 = 0;
-constexpr int TS_H265 = 1;
-constexpr int TS_AAC  = 2;
-constexpr int TS_OPUS = 3;
-constexpr int PACKET_SIZE=1316;
-
 class LibmpegtsImpl;
 
 class LIBMPEGTS_EXPORT Libmpegts
 {
+    static constexpr int DEFALUT_PACKET_SIZE=188*7;
 public:
-    explicit Libmpegts();
+    static constexpr int TS_H264 = 0;
+    static constexpr int TS_H265 = 1;
+    static constexpr int TS_AAC  = 2;
+    static constexpr int TS_OPUS = 3;
+public:
+    explicit Libmpegts(int ts_packet_size = DEFALUT_PACKET_SIZE);
 
     ~Libmpegts();
+
+    const int tsPacketSize() const;
 
     uint8_t **encode(uint8_t *data,int32_t size,int64_t pts_us,int stream_type);
 private:
